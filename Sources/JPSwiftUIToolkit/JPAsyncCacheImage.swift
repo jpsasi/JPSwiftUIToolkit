@@ -44,14 +44,19 @@ public struct JPAsyncCacheImage<Content>: View where Content: View {
 }
 
 #Preview {
-  JPAsyncCacheImage(url: URL(string: "https://picsum.photos/200/300" )!, scale: 1.0, transaction: .init(animation: .easeIn)) { phase in
+  JPAsyncCacheImage(url: URL(string: "https://picsum.photos/4400/4900" )!, scale: 1.0, transaction: .init(animation: .easeIn)) { phase in
     if case let .success(image) = phase {
       image
         .resizable()
         .aspectRatio(contentMode: .fill)
         .ignoresSafeArea()
+    } else if case .failure(let error) = phase {
+      Image(systemName: "exclamationmark.triangle")
+        .resizable()
+        .aspectRatio(contentMode: .fit)
+        .ignoresSafeArea()
     } else {
-      Text("Unable to load Image")
+      ProgressView()
     }
   }
 }
