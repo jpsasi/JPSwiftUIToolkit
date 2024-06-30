@@ -16,7 +16,7 @@ public struct JPAsyncCacheImage<Content>: View where Content: View {
   let transaction: Transaction
   let content: (AsyncImagePhase) -> Content
 
-  init(url: URL, scale: CGFloat = 1.0,
+  public init(url: URL, scale: CGFloat = 1.0,
        transaction: Transaction = .init(animation: .easeIn),
        @ViewBuilder content: @escaping (AsyncImagePhase) -> Content) {
     self.url = url
