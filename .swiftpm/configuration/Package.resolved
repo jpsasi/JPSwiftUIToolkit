@@ -1,0 +1,15 @@
+{
+  "originHash" : "f31081b1f8e66da5396ce42f7b59b516b12f6311a4dc25db4aaeebd4354f1b20",
+  "pins" : [
+    {
+      "identity" : "jpswifttoolkit",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/jpsasi/JPSwiftToolkit",
+      "state" : {
+        "branch" : "main",
+        "revision" : "88396846bc006386f88b992260fa655c9abf50a9"
+      }
+    }
+  ],
+  "version" : 3
+}

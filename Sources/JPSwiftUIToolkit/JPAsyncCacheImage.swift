@@ -8,7 +8,7 @@
 import SwiftUI
 import JPSwiftToolkit
 
-public var ImageCache: JPCache<URL, Image> = JPCache()
+@MainActor public var ImageCache: JPCache<URL, Image> = JPCache()
 
 public struct JPAsyncCacheImage<Content>: View where Content: View {
   let url: URL
