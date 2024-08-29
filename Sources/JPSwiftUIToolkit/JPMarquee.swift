@@ -16,6 +16,16 @@ public struct JPMarquee: View {
   let animationSpeed: CGFloat
   private let delay: CGFloat = 0.5
   
+  public init(
+    text: Binding<String>,
+    animationSpeed: CGFloat,
+    font: UIFont = .systemFont(ofSize: 16.0)
+  ) {
+    self._text = text
+    self.font = font
+    self.animationSpeed = animationSpeed
+  }
+  
   public var body: some View {
     ScrollView(.horizontal) {
       Text(text)
@@ -56,6 +66,6 @@ public struct JPMarquee: View {
 
 #Preview {
   @Previewable @State var text = "This is test message to test Marquee"
-  JPMarquee(text: $text, font: .systemFont(ofSize: 21), animationSpeed: 0.02)
+  JPMarquee(text: $text, animationSpeed: 0.02)
     .padding(.horizontal)
 }
