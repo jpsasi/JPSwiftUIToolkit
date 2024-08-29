@@ -8,20 +8,13 @@
 import SwiftUI
 
 public struct JPMarquee: View {
-  @State private var text: String
+  @Binding var text: String
   @State private var textSize: CGSize = .zero
   @State private var offset: CGFloat = .zero
   
-  private var font: UIFont
-  private let animationSpeed: CGFloat
+  let font: UIFont
+  let animationSpeed: CGFloat
   private let delay: CGFloat = 0.5
-  
-  public init(text: String, animationSpeed: CGFloat = 0.02,
-              font: UIFont = .systemFont(ofSize: 16.0)) {
-    self.text = text
-    self.animationSpeed = animationSpeed
-    self.font = font
-  }
   
   public var body: some View {
     ScrollView(.horizontal) {
@@ -62,6 +55,7 @@ public struct JPMarquee: View {
 }
 
 #Preview {
-  JPMarquee(text: "This is test message to test Marquee", animationSpeed: 0.01)
+  @Previewable @State var text = "This is test message to test Marquee"
+  JPMarquee(text: $text, font: .systemFont(ofSize: 21), animationSpeed: 0.02)
     .padding(.horizontal)
 }
