@@ -20,12 +20,14 @@ public struct JPMarquee: View {
   //View Modifier Properties
   var padding: EdgeInsets = .init()
   var font: Font = .callout
-
+  var foregoundStyle: AnyShapeStyle = AnyShapeStyle(Color.primary)
+  
   public var body: some View {
     VStack {
       ScrollView(.horizontal) {
         Text(displayText)
           .font(font)
+          .foregroundStyle(foregoundStyle)
           .offset(x: offset)
           .padding(padding)
           .onAppear {
@@ -87,7 +89,10 @@ public struct JPMarquee: View {
     let attributes = [NSAttributedString.Key.font: font]
     return (text as NSString).size(withAttributes: attributes)
   }
-  
+}
+
+//MARK: ViewModifier implementations
+public extension JPMarquee {
   func padding(_ insets: EdgeInsets = .init()) -> JPMarquee {
     var copy = self
     copy.padding = insets
@@ -97,6 +102,12 @@ public struct JPMarquee: View {
   func font(_ font: Font) -> JPMarquee {
     var copy = self
     copy.font = font
+    return copy
+  }
+  
+  func foregroundStyle(_ style: ForegroundStyle) -> JPMarquee {
+    var copy = self
+    copy.foregoundStyle = foregoundStyle
     return copy
   }
 }
