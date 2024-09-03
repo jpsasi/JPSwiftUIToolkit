@@ -9,63 +9,144 @@ import SwiftUI
 
 public struct JPMarquee: View {
   @Binding var text: String
+  @State private var displayText: String = ""
+  @State private var containerSize: CGSize = .zero
+  @State private var offset: CGFloat = 0.0
   @State private var textSize: CGSize = .zero
-  @State private var offset: CGFloat = .zero
+  @State private var originalTextSize: CGSize = .zero
+  @State private var shouldAnimate: Bool = false
+  @State private var id: Int = 0
   
-  let font: UIFont
-  let animationSpeed: CGFloat
-  private let delay: CGFloat = 0.5
-  
-  public init(
-    text: Binding<String>,
-    animationSpeed: CGFloat,
-    font: UIFont = .systemFont(ofSize: 16.0)
-  ) {
-    self._text = text
-    self.font = font
-    self.animationSpeed = animationSpeed
-  }
-  
+  //View Modifier Properties
+  var padding: EdgeInsets = .init()
+  var font: Font = .callout
+
   public var body: some View {
-    ScrollView(.horizontal) {
-      Text(text)
-        .font(Font(font))
-        .offset(x: offset)
+    VStack {
+      ScrollView(.horizontal) {
+        Text(displayText)
+          .font(font)
+          .offset(x: offset)
+          .padding(padding)
+          .onAppear {
+            DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
+              originalTextSize = textSize(text: self.text)
+              if originalTextSize.width >= containerSize.width {
+                self.displayText = self.text + Array(repeating: " ", count: 30)
+                textSize = textSize(text: self.displayText)
+                self.displayText = self.displayText + self.text
+                shouldAnimate = true
+                animate()
+              } else {
+                self.displayText = self.text
+              }
+            }
+          }
+          .onChange(of: text, {
+            offset = 0
+            id += 1
+          })
+          .onReceive(
+            Timer
+              .publish(
+                every: (0.02 * textSize.width) + 3.0,
+                on: .main,
+                in: .default
+              ).autoconnect()) { _ in
+                offset = 0
+                if shouldAnimate {
+                  animate()
+                }
+              }
+      }
+      .background(
+        GeometryReader { scrollViewProxy in
+          Color.clear
+            .onAppear {
+              containerSize = scrollViewProxy.size
+            }
+        }
+      )
     }
-    .disabled(false)            // Disable the manual scrolling
-    .scrollIndicators(.hidden)  //hide the scrolling indicators
-    .onAppear {
-      text.append(String(repeating: " ", count: 20))
-      textSize = size()
-      text.append(text)
-      animate()
-    }
-    .onReceive(
-      Timer.publish(
-        every: animationSpeed * textSize.width + delay,
-        on: .main,
-        in: .default)
-      .autoconnect()) { _ in
-      offset = 0
-      animate()
+    .id(id)
+  }
+  
+  private func animate() {
+    offset = 0
+    let duration = 0.02 * textSize.width
+    withAnimation(.linear(duration: duration)) {
+      offset = -textSize.width
     }
   }
   
-  func size() -> CGSize {
-    let attributes = [NSAttributedString.Key.font : font]
+  private func textSize(text: String) -> CGSize {
+    guard let font = UIFont.from(font: font) else {
+      print("Font is nil")
+      return .zero
+    }
+    let attributes = [NSAttributedString.Key.font: font]
     return (text as NSString).size(withAttributes: attributes)
   }
   
-  func animate() {
-    let timeInterval = animationSpeed * textSize.width
-    withAnimation(.linear(duration: timeInterval)) {
-      offset = -textSize.width
+  func padding(_ insets: EdgeInsets = .init()) -> JPMarquee {
+    var copy = self
+    copy.padding = insets
+    return copy
+  }
+  
+  func font(_ font: Font) -> JPMarquee {
+    var copy = self
+    copy.font = font
+    return copy
+  }
+}
+
+fileprivate extension UIFont {
+  static func from(font: Font) -> UIFont? {
+    switch font {
+    case .largeTitle:
+      return UIFont.preferredFont(forTextStyle: .largeTitle)
+    case .subheadline:
+      return UIFont.preferredFont(forTextStyle: .subheadline)
+    case .title:
+      return UIFont.preferredFont(forTextStyle: .title1)
+    case .title2:
+      return UIFont.preferredFont(forTextStyle: .title2)
+    case .title3:
+      return UIFont.preferredFont(forTextStyle: .title3)
+    case .headline:
+      return UIFont.preferredFont(forTextStyle: .headline)
+    case .body:
+      return UIFont.preferredFont(forTextStyle: .body)
+    case .caption:
+      return UIFont.preferredFont(forTextStyle: .caption1)
+    case .caption2:
+      return UIFont.preferredFont(forTextStyle: .caption2)
+    case .footnote:
+      return UIFont.preferredFont(forTextStyle: .footnote)
+    case .callout:
+      return UIFont.preferredFont(forTextStyle: .callout)
+    default:
+      return nil
     }
   }
 }
 
 #Preview {
-  @Previewable @State var text = "This is test message to test Marquee"
-  JPMarquee(text: $text, animationSpeed: 0.02)
-    .padding(.horizontal)
+  @Previewable @State var text = "Testing SwiftUI Marquee Text. I am testing and scrolling behaviour"
+  VStack {
+    JPMarquee(text: $text)
+      .font(.headline)
+    Button {
+      text += ">"
+    } label: {
+      Text("Update")
+    }
+    
+    Button {
+      text.removeLast()
+    } label: {
+      Text("Remove")
+    }
+  }
 }
