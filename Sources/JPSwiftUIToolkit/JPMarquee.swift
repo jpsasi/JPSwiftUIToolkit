@@ -22,6 +22,10 @@ public struct JPMarquee: View {
   var font: Font = .callout
   var foregoundStyle: AnyShapeStyle = AnyShapeStyle(Color.primary)
   
+  public init(text: Binding<String>) {
+    self._text = text
+  }
+  
   public var body: some View {
     VStack {
       ScrollView(.horizontal) {
